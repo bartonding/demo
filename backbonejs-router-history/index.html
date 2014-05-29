@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>backbonejs router history view demo</title>
+<link rel="stylesheet" type="text/css" href="css/index.css">
+</head>
+<body>
+<h1>BackboneJS demo: Router, History, View</h1>
+<hr>
+<div id="output">content of navigate ......</div>
+<button id="help">navigate to 'help'</button>
+<button id="search1">navigate to 'search/barton'</button>
+<button id="search2">navigate to 'search/barton/p123'</button>
+
+<script src="scripts/libs/jquery-1.11.1.min.js"></script>
+<script src="scripts/libs/underscore-min.js"></script>
+<script src="scripts/libs/json2.js"></script>
+<script src="scripts/libs/backbone-min.js"></script>
+<script src="scripts/libs/sea-debug.js"></script>
+<script src="scripts/libs/seajs-text.js"></script>
+<script type="text/javascript">
+seajs.config({
+    base: './scripts/',
+    debug: true,
+    charset : 'utf-8'
+});
+seajs.use('index');
+</script>
+</body>
+</html>
