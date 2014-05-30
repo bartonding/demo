@@ -8,10 +8,26 @@
 <body>
 <h1>BackboneJS demo: Router, History, View</h1>
 <hr>
-<div id="output">content of navigate ......</div>
-<button id="help">navigate to 'help'</button>
-<button id="search1">navigate to 'search/barton'</button>
-<button id="search2">navigate to 'search/barton/p123'</button>
+<div style="display:none;">
+    <div id="output">content of navigate ......</div>
+    <button id="help">navigate to 'help'</button>
+    <button id="search1">navigate to 'search/barton'</button>
+    <button id="search2">navigate to 'search/barton/p123'</button>
+</div>
+
+<div tab-wraper data-name="outer">
+    <div tab-navs>
+        <button tab-nav data-name="nav1">nav1</button>
+        <button tab-nav data-name="nav2">nav2</button>
+        <button tab-nav data-name="nav3">nav3</button>
+    </div>
+    <div tab-contents>
+        <div tab-content>nav1</div>
+        <div tab-content>nav2</div>
+        <div tab-content>nav3</div>
+    </div>
+</div>
+
 
 <script src="scripts/libs/jquery-1.11.1.min.js"></script>
 <script src="scripts/libs/underscore-min.js"></script>

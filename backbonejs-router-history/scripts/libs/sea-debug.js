@@ -301,7 +301,7 @@ function request(url, callback, charset) {
   }
   else {
     node.async = true
-    node.src = url
+    node.src = url //+ '?' + (+new Date)
   }
 
   // For some cache cases in IE 6-8, the script executes IMMEDIATELY after

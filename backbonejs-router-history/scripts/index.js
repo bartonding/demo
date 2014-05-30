@@ -1,37 +1,22 @@
 define(function (require, exports, module) {
     console.log('page start...');
-    var test = require('../templates/test.html');
-    $('h1').append(test);
-    // console.log(test);
 
-    var app = require('./my-router');
+    var router = require('./my-router');
+    var tabs = require('./jnx-tabs');
+    tabs.set('router', router);
 
-
-    app.on('route:help', function () {
-        console.log('app.on route:help ...');
+    tabs.on('tabChange', function (tabName, navName, navId, contentId) {
+        console.log('tab change: ', arguments);
     });
 
-    app.on('route:search', function () {
-        console.log('app.on route:search ... ', arguments);
-    });
+    // tabs.on('outer:nav2', function (tabName, navName, navId, contentId) {
+    //     console.log('outer:nav2', arguments);
+    // });
 
-
-    Backbone.history.start({
-        pushState: false
-        ,hashChange: true
-        // ,root: '/git/demo/backbonejs-router-history/'
+    var hasHash = Backbone.history.start({
+        pushState: false, hashChange: true
     });
-
-    // -------------------------------------------------------------------------
-    $('#help').on('click', function (evt) {
-        app.navigate("help", {trigger: true, replace: false});
-    });
-
-    $('#search1').on('click', function (evt) {
-        app.navigate("search/barton", {trigger: true, replace: false});
-    });
-
-    $('#search2').on('click', function (evt) {
-        app.navigate("search/barton/p123", {trigger: true, replace: false});
-    });
+    // console.log('>>>>> has hash in current url : ', hasHash);
+    // 默认展开的 tab
+    if(!hasHash) router.navigate('tabs/outer/nav2', {trigger: true});
 });

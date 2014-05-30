@@ -5,17 +5,22 @@ define(function (require, exports, module) {
         // 对外部注册的路由事件无效
         execute: function(callback, args) {
             // args.push(parseQueryString(args.pop()));
-            // console.log('------------------');
+            console.log('------------------');
             // console.log(callback.toString(), args);
 
             if (callback) callback.apply(this, args);
         },
 
         routes: {
+            // "tab/:tab/:nav": "tabs",
             "help":                 "help",    // #help
             "search/:query":        "search",  // #search/kiwis
             "search/:query/p:page": "search"   // #search/kiwis/p7
         },
+
+        // tabs: function (tab, nav) {
+        //     console.log('tabs: ', tab, nav);
+        // },
 
         help: function() {
             console.log('Router.help');
