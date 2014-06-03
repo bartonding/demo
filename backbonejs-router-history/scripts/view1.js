@@ -18,7 +18,8 @@ define(function (require, exports, module) {
         },
 
         render: function() {
-            return this.$el.html(this.template());
+            this.$el.html(this.template());
+            return this;
         },
 
         _listCache: [],
@@ -52,11 +53,11 @@ define(function (require, exports, module) {
 
         setPaging: function (paging) {
             this.paging = paging;
-            paging.setElement(this.$el.find('div.paging'));
+            this.paging.setElement(this.$el.find('div.paging'));
         },
 
         renderPaging: function (total, current) {
-            var paging = this.paging.render(total, current || 1);
+            this.paging.render(total, current || 1);
         }
     });
 

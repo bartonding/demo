@@ -20,13 +20,14 @@ define(function (require, exports, module) {
     var nav2Init = _.once(function (ctid) {
         console.log('nav2 init ......');
         var content = $('#' + ctid);
-        view1.setPaging(new Paging);
-        content.html(view1.render());
+        content.empty().append(view1.render().$el);
+        view1.setPaging(new Paging());
     });
     tabs.on('outer:nav2', function (tabName, navName, navId, contentId) {
         console.log('outer:nav2', arguments);
         nav2Init(contentId);
         ds.getData('query obj', function (json) {
+            view1.renderPaging(600, 4);
             view1.renderList(json.items, View1Item);
         });
     });
