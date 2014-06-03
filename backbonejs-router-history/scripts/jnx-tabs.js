@@ -45,9 +45,9 @@ define(function (require, exports, module) {
         },
         // 标识当前正在显示的tab，包括 nav 和 content 部分
         'active': 'active',
-        // 当前的 tab 选项卡的 ID
-        // 可以通过 tabs.get('current_nav') 获取
-        'current_nav': ''
+        // 当前选项卡的状态
+        // 可以通过 tabs.get('status') 获得
+        'status': {tabName: '', navName: '', navId: '', contentId: ''}
     };
 
     var Tabs = function () {
@@ -98,6 +98,7 @@ define(function (require, exports, module) {
                     var nav = $(this);
                     if (nav.hasClass(active)) return;
 
+                    var vname = nav.data('name');
                     var nav_id = nav.attr('id');
                     var content_id = nav.data('contentid');
                     var content = $('#' + content_id);
@@ -107,11 +108,9 @@ define(function (require, exports, module) {
                     content.addClass(active);
 
                     wraper.attr('data-navid', nav_id);
-                    self.set('current_nav', nav_id);
+                    self._setStatus(wname, vname, nav_id, content_id);
 
-                    var vname = nav.data('name');
                     self.browserNavigate(wname, vname);
-
                     self._tabChange(wname, vname, nav_id, content_id);
                 });
             };
@@ -119,6 +118,15 @@ define(function (require, exports, module) {
             $(S.wraper).each(function (idx, wraper) {
                 initWraper.apply(self, [$(wraper)]);
             });
+        },
+
+        // {tabName: '', navName: '', navId: '', contentId: ''}
+        _setStatus: function (_tabName, _navName, _navId, _contentId) {
+            var status = this.get('status');
+            status['tabName'] = _tabName;
+            status['navName'] = _navName;
+            status['navId'] = _navId;
+            status['contentId'] = _contentId;
         },
 
         // 首次设置 router 时，注册 route[tabs]
@@ -146,7 +154,7 @@ define(function (require, exports, module) {
             var contents = content.closest(S.contents);
 
             wraper.attr('data-navid', nav_id);
-            this.set('current_nav', nav_id);
+            this._setStatus(_tab, _nav, nav_id, content_id);
 
             navs.find(S.nav).removeClass(active);
             contents.find(S.content).removeClass(active);
