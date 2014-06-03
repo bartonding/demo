@@ -25,3 +25,28 @@
 div.active[tab-content]{
     display: block;
 }
+
+.paging{
+    overflow: hidden;
+    margin: 10px;
+}
+.paging span,
+.paging a{
+    float: left;
+    height: 26px;
+    line-height: 26px;
+    margin: 0 5px;
+    border: 1px solid #999;
+    background-color: #DDD;
+    text-align: center;
+    width: 35px;
+    text-decoration: none;
+}
+.paging a{}
+.paging a:hover{
+    background-color: red;
+    color: #FFF;
+}
+.paging span{}
+.paging span.current{}
+.paging span.pdot{}

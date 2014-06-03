@@ -46,7 +46,21 @@ define(function (require, exports, module) {
 
     var Paging = Backbone.View.extend({
 
-        events: {},
+        events: {
+            'click a': 'gotopage'
+        },
+
+        initialize: function (router) {
+            this.router = router;
+        },
+
+        gotopage: function (evt) {
+            evt.preventDefault();
+            var self = $(evt.target);
+            var page = self.data('page');
+            console.log(page, this.router._status);
+            this.router.trigger('pageChange', page);
+        },
 
         createTag: function (tag, content, val, className) {
             val || (val = 0);
@@ -57,10 +71,9 @@ define(function (require, exports, module) {
                     '<span class="', className, '">', content, '</span>'
                 ].join('');
             }
-            // else if (tag === 'a') {}
             return [
-                '<a href="javascript:void(', val ,');" class="', className, '">',
-                    content, '</a>'
+                '<a href="javascript:void(', val ,');" class="', className, '"',
+                    'data-page="', val, '">', content, '</a>'
             ].join('');
         },
 
@@ -69,9 +82,12 @@ define(function (require, exports, module) {
             if (cp !== pages[0]) o.push(this.createTag('a', '&lt;', cp - 1));
             for (var i = 0, l = pages.length; i < l; i++) {
                 var p = pages[i];
-                if (p === DOT_SPACE) o.push(this.createTag('span', DOT_SPACE, 'pdot'));
-                else if (p === cp) o.push(this.createTag('span', p, p, 'current'));
-                else o.push(this.createTag('a', p, p));
+                if (p === DOT_SPACE)
+                    o.push(this.createTag('span', DOT_SPACE, '', 'pdot'));
+                else if (p === cp)
+                    o.push(this.createTag('span', p, p, 'current'));
+                else
+                    o.push(this.createTag('a', p, p));
             }
             if (cp !== pages[pages.length - 1]) {
                 o.push(this.createTag('a', '&gt;', cp + 1));
