@@ -35,6 +35,8 @@
 //
 define(function (require, exports, module) {
 
+    var utils = require('./utils');
+
     var DEFAULT_CONFIG = {
         'selector': {
             'wraper' : '[tab-wraper]',
@@ -56,6 +58,13 @@ define(function (require, exports, module) {
     };
 
     _.extend(Tabs.prototype, Backbone.Events, {
+
+        _tabCaches: {},
+
+        getTab: function (tab, nav) {
+            var key = nav ? utils.getKey(tab, nav) : tab;
+            return this._tabCaches[key];
+        },
 
         initialize: function () {
             var self = this;
@@ -92,6 +101,11 @@ define(function (require, exports, module) {
                     if (hasActiveNav && nav.hasClass(active)) {
                         wraper.attr('data-navid', nav_id);
                     }
+
+                    self._tabCaches[utils.getKey(wname, vname)] = {
+                        'navId': nav_id,
+                        'contentId': content_id
+                    };
                 });
 
                 _navs.on('click', S.nav, function (evt) {
@@ -110,7 +124,6 @@ define(function (require, exports, module) {
                     wraper.attr('data-navid', nav_id);
                     self._setStatus(wname, vname, nav_id, content_id);
 
-                    self.browserNavigate(wname, vname);
                     self._tabChange(wname, vname, nav_id, content_id);
                 });
             };
@@ -118,6 +131,7 @@ define(function (require, exports, module) {
             $(S.wraper).each(function (idx, wraper) {
                 initWraper.apply(self, [$(wraper)]);
             });
+            console.log('tab init finish. ', self._tabCaches);
         },
 
         // {tabName: '', navName: '', navId: '', contentId: ''}
@@ -129,19 +143,9 @@ define(function (require, exports, module) {
             status['contentId'] = _contentId;
         },
 
-        // 首次设置 router 时，注册 route[tabs]
-        // 浏览器前进后退时触发注册的路由，然后调整到指定的tab
-        initRounter: function () {
-            var router = this.get('router');
-            var self = this;
-            router.route("tabs/:tab/:nav", "tabs", function(_tab, _nav){
-                self.jumpTo(_tab, _nav);
-            });
-        },
-
         // 跳转到指定的选项卡页
-        // 模块外部调用此方法时，可以通过指定第三个参数来确定是否更新浏览器导航
-        jumpTo: function (_tab, _nav, isUpdateNavigate) {
+        // 可以通过指定第三个参数来确定是否触发 tabChange 事件
+        jumpTo: function (_tab, _nav, noTrigger) {
             var S = this.get('selector');
             var active = this.get('active');
 
@@ -161,9 +165,7 @@ define(function (require, exports, module) {
             nav.addClass(active);
             content.addClass(active);
 
-            isUpdateNavigate && this.browserNavigate(_tab, _nav);
-
-            this._tabChange(_tab, _nav, nav_id, content_id);
+            !noTrigger && this._tabChange(_tab, _nav, nav_id, content_id);
         },
 
         /**
@@ -179,21 +181,11 @@ define(function (require, exports, module) {
          * @return {[type]}      [description]
          */
         _tabChange: function (_tab, _nav, _nid, _cid) {
-            this.trigger('tabChange', _tab, _nav, _nid, _cid);
-            this.trigger(_tab + ':' + _nav, _tab, _nav, _nid, _cid);
-        },
-
-        // 切换 tab 时更新浏览器历史记录
-        browserNavigate: function (tab, nav) {
-            var router = this.get('router');
-            if (router && router.navigate) {
-                router.navigate(['tabs', tab, nav].join('/'), {trigger: false});
-            }
+            this.get('router').trigger('tabChange', _tab, _nav, _nid, _cid);
         },
 
         set: function (name, value) {
             this.setting[name] = value;
-            if (name === 'router') this.initRounter();
             return this;
         },
 

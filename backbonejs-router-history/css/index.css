@@ -48,5 +48,8 @@ div.active[tab-content]{
     color: #FFF;
 }
 .paging span{}
-.paging span.current{}
+.paging span.current{
+    background-color: #000;
+    color: #FFF;
+}
 .paging span.pdot{}

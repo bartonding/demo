@@ -1,85 +1,76 @@
 define(function (require, exports, module) {
     console.log('page start...');
+    var utils = require('./utils');
+    var tabs = require('./jnx-tabs');
     // -------------------------------------------------------------------------
     var Router = Backbone.Router.extend({
         routes: {
             "r/:tab/:nav/:page": "redirect"
         },
+        views: {},
         _status: {},
         set: function (key, val) { this._status[key] = val; return this;},
         get: function (key, defVal) { return this._status[key] || defVal},
         initialize: function () {
             this.on('tabChange', _.bind(this.tabChange, this));
             this.on('pageChange', _.bind(this.pageChange, this));
+            console.log('router init finish.');
         },
-        getkey: function (tab, nav) {
+        getKey: function (tab, nav) {
             tab || (tab = this.get('tab'));
             nav || (nav = this.get('nav'));
-            return tab + '_' + nav;
+            return utils.getKey(tab, nav);
         },
         tabChange: function (tab, nav, navId, contentId) {
             this.set('tab', tab).set('nav', nav)
                 .set('navId', navId).set('contentId', contentId);
-            var key = this.getkey();
+            var key = this.getKey();
             this.set('page', this.get(key) || 1);
             this._navigate();
         },
         pageChange: function (page) {
-            this.set('page', page).set(this.getkey(), page);
+            this.set('page', page).set(this.getKey(), page);
             this._navigate();
         },
         _navigate: function () {
             var tab  = this.get('tab');
             var nav  = this.get('nav');
             var page = this.get('page');
-            this.navigate([tab, nav, page].join('/'), {trigger: true});
+            this.navigate(['r', tab, nav, page].join('/'), {trigger: false});
+            this.renderView();
         },
         redirect: function (tab, nav, page) {
-            page = page - 0;
-            if (_.isEmpty(this._status)) {
-                this.set('tab', tab).set('nav', nav).set('page', page)
-                    .set(this.getkey(), page);
-            }
             console.log('router redirect to ... ', arguments);
-            if (this.views) {
-                var view = this.views[this.getkey()];
-                view.render();
-            }
+            page = page - 0;
+            this.set('tab', tab).set('nav', nav).set('page', page)
+                .set(this.getKey(), page);
+
+            tabs.jumpTo(this.get('tab'), this.get('nav'), true);
+            this.renderView();
         },
-        mountViews: function (views) {
-            this.views = views;
+        renderView: function () {
+            var view = this.views[this.getKey()];
+            view && view.render();
+        },
+        mountView: function (view) {
+            this.views[view.getKey()] = view;
+        },
+        getTab: function (tab, nav) {
+            return tabs.getTab(tab, nav);
         }
     });
-    var router = window.router = new Router();
     // -------------------------------------------------------------------------
-    var tabs = require('./jnx-tabs');
+    var router = window.router = new Router();
+
     tabs.set('router', router);
 
+    // mount views
     var View1 = require('./view1');
-
-
-    var ds1 = require('./data-source-1');
-    var view1 = new View1();
-    var View1Item = require('./view1-item');
-    var Paging = require('./paging');
-
-    var nav2Init = _.once(function (ctid) {
-        console.log('nav2 init ......');
-        var content = $('#' + ctid);
-        content.empty().append(view1.render().$el);
-        view1.setPaging(new Paging(router));
-    });
-    // tabs.on('tabChange', function (tabName, navName, navId, contentId) {
-    //     console.log('tab change: ', arguments);
-    // });
-    tabs.on('outer:nav2', function (tabName, navName, navId, contentId) {
-        console.log('outer:nav2', arguments);
-        nav2Init(contentId);
-        ds1.getData('query obj', function (json) {
-            view1.renderPaging(json.total, 1);
-            view1.renderList(json.items, View1Item);
-        });
-    });
+    var View2 = require('./view2');
+    var View3 = require('./view3');
+    router.mountView(new View1(router, tabs));
+    router.mountView(new View2(router, tabs));
+    router.mountView(new View3(router, tabs));
 
     // -------------------------------------------------------------------------
     var hasHash = Backbone.history.start({
